@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<script>
+function sendMSG(){
+fetch(`https://apiwachat-1.apierp.dev/wa/3030/send`, {
+method: 'POST',
+headers: { 
+'x-auth-token': 'Cr6ZdDPfZ1Bw1IlIahm9y9618ECknHeRuKnEo5dJn7Y', 
+'Content-Type': 'application/json' 
+},
+body: JSON.stringify({
+to: '51954738620@s.whatsapp.net',
+payload: {
+type: 'text',
+content: 'Hola, este es un mensaje de prueba'
+}
+})
+}).then(res => res.json()).then(console.log).catch(console.error);
+}
+</script>
+</body>
+</html>
