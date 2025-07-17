@@ -1,28 +1,731 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WhatsApp Messenger Pro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --whatsapp-green: #25D366;
+      --whatsapp-dark: #075E54;
+      --whatsapp-light: #128C7E;
+      --whatsapp-chat: #DCF8C6;
+      --whatsapp-background: #ECE5DD;
+      --whatsapp-header: #F0F2F5;
+      --error-red: #FF4444;
+      --success-green: #00C851;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--whatsapp-background);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #333;
+    }
+
+    /* Header estilo WhatsApp */
+    .app-header {
+      background-color: var(--whatsapp-dark);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+
+    .app-header h1 {
+      font-size: 1.3rem;
+      font-weight: 500;
+    }
+
+    .app-header .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .app-header .logo i {
+      margin-right: 10px;
+      font-size: 1.5rem;
+    }
+
+    /* Contenedor principal */
+    .container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Panel lateral estilo WhatsApp */
+    .sidebar {
+      width: 350px;
+      background-color: white;
+      border-right: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 15px;
+      background-color: var(--whatsapp-header);
+      border-bottom: 1px solid #ddd;
+    }
+
+    .search-bar {
+      display: flex;
+      background-color: white;
+      border-radius: 8px;
+      padding: 8px 15px;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .search-bar input {
+      flex: 1;
+      border: none;
+      padding: 5px 10px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-bar i {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .contact-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .contact-item {
+      padding: 12px 15px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .contact-item:hover {
+      background-color: #f5f5f5;
+    }
+
+    .contact-item.active {
+      background-color: var(--whatsapp-chat);
+    }
+
+    .contact-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--whatsapp-light);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-weight: 500;
+    }
+
+    .contact-info {
+      flex: 1;
+    }
+
+    .contact-name {
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .contact-number {
+      font-size: 13px;
+      color: #666;
+    }
+
+    /* Área de chat principal */
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-image: url('https://web.whatsapp.com/img/bg-chat-tile-light_a4be512e7195b6b733d9110b408f075d.png');
+      background-repeat: repeat;
+    }
+
+    .chat-container {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Mensaje de chat */
+    .message {
+      max-width: 70%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      position: relative;
+      word-wrap: break-word;
+    }
+
+    .message.received {
+      background-color: white;
+      align-self: flex-start;
+      border-top-left-radius: 0;
+    }
+
+    .message.sent {
+      background-color: var(--whatsapp-chat);
+      align-self: flex-end;
+      border-top-right-radius: 0;
+    }
+
+    .message-time {
+      font-size: 11px;
+      color: #666;
+      text-align: right;
+      margin-top: 3px;
+    }
+
+    /* Input area estilo WhatsApp */
+    .input-area {
+      background-color: var(--whatsapp-header);
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+      border-top: 1px solid #ddd;
+    }
+
+    .input-area input {
+      flex: 1;
+      border-radius: 20px;
+      border: none;
+      padding: 10px 15px;
+      font-size: 15px;
+      outline: none;
+      margin: 0 10px;
+    }
+
+    .btn-send {
+      background-color: var(--whatsapp-green);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-send:hover {
+      background-color: var(--whatsapp-light);
+      transform: scale(1.05);
+    }
+
+    .btn-send:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Panel de configuración */
+    .config-panel {
+      width: 350px;
+      background-color: white;
+      border-left: 1px solid #ddd;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .config-section {
+      margin-bottom: 25px;
+    }
+
+    .config-section h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: var(--whatsapp-dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .config-section h3 i {
+      margin-right: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .form-group select, 
+    .form-group input[type="text"] {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .btn {
+      background-color: var(--whatsapp-green);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn i {
+      margin-right: 8px;
+    }
+
+    .btn:hover {
+      background-color: var(--whatsapp-light);
+    }
+
+    .btn-block {
+      display: block;
+      width: 100%;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--success-green);
+      color: white;
+      padding: 12px 25px;
+      border-radius: 25px;
+      font-size: 14px;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .toast.error {
+      background: var(--error-red);
+    }
+
+    /* Loading spinner */
+    .loading {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .config-panel {
+        display: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .sidebar {
+        width: 100%;
+      }
+      
+      .chat-area {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
-<script>
-function sendMSG(){
-fetch(`https://apiwachat-1.apierp.dev/wa/3021/send`, {
-method: 'POST',
-headers: { 
-'x-auth-token': 'HV5Teaj66n6sOdpy_z_x0uA9qQCJqV3PIm152yiWp5s', 
-'Content-Type': 'application/json' 
-},
-body: JSON.stringify({
-to: '51916173721@s.whatsapp.net',
-payload: {
-type: 'text',
-content: 'Hola, este es un mensaje de prueba'
-}
-})
-}).then(res => res.json()).then(console.log).catch(console.error);
-}
-</script>
+  <!-- Header estilo WhatsApp -->
+  <header class="app-header">
+    <div class="logo">
+      <i class="fab fa-whatsapp"></i>
+      <h1>WhatsApp Messenger Pro</h1>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Panel lateral de contactos -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Buscar o empezar nuevo chat">
+        </div>
+      </div>
+      
+      <div class="contact-list">
+        <!-- Contactos se cargarán aquí dinámicamente -->
+      </div>
+    </div>
+
+    <!-- Área de chat principal -->
+    <div class="chat-area">
+      <div class="chat-container" id="chatContainer">
+        <!-- Mensajes se mostrarán aquí -->
+        <div class="message received">
+          ¡Hola! Bienvenido a WhatsApp Messenger Pro
+          <div class="message-time">10:30 AM</div>
+        </div>
+      </div>
+      
+      <div class="input-area">
+        <button class="btn-emoji"><i class="far fa-smile"></i></button>
+        <input type="text" id="mensajeIndividual" placeholder="Escribe un mensaje..." />
+        <button class="btn-send" id="btnEnviarIndividual">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Panel de configuración -->
+    <div class="config-panel">
+      <div class="config-section">
+        <h3><i class="fas fa-users"></i> Envío Masivo</h3>
+        
+        <div class="form-group">
+          <label for="tipoCliente">Grupo de clientes:</label>
+          <select id="tipoCliente">
+            <option value="">-- Selecciona un grupo --</option>
+            <option value="mayoristas">Clientes Mayoristas</option>
+            <option value="minoristas">Clientes Minoristas</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="mensaje">Mensaje:</label>
+          <input type="text" id="mensaje" placeholder="Escribe tu mensaje...">
+        </div>
+        
+        <button class="btn btn-block" id="btnEnviarMasivo">
+          <i class="fas fa-paper-plane"></i> Enviar a todos
+        </button>
+      </div>
+      
+      <div class="config-section">
+        <h3><i class="fas fa-cog"></i> Configuración</h3>
+        
+        <div class="form-group">
+          <label for="apiEndpoint">Endpoint de API:</label>
+          <input type="text" id="apiEndpoint" value="https://apiwachat-1.apierp.dev/wa/3021/send">
+        </div>
+        
+        <div class="form-group">
+          <label for="apiToken">API Token:</label>
+          <input type="text" id="apiToken" value="HV5Teaj66n6sOdpy_z_x0uA9qQCJqV3PIm152yiWp5s">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Mensaje enviado correctamente</div>
+
+  <script>
+    // Configuración de la API
+    const API_CONFIG = {
+      endpoint: 'https://apiwachat-1.apierp.dev/wa/3021/send',
+      token: 'HV5Teaj66n6sOdpy_z_x0uA9qQCJqV3PIm152yiWp5s'
+    };
+
+    // Base de datos de clientes
+    const clientes = {
+      mayoristas: [
+        { 
+          nombre: "Josue Sandoval", 
+          codigoPais: "51", 
+          numeroWhatsApp: "942360587",
+          empresa: "Distribuciones JS",
+          avatar: "JS"
+        },
+        { 
+          nombre: "Erwin Riofrio", 
+          codigoPais: "51", 
+          numeroWhatsApp: "947339263",
+          empresa: "Bebidas ER",
+          avatar: "ER"
+        }
+      ],
+      minoristas: [
+        { 
+          nombre: "Leonardo Giron", 
+          codigoPais: "51", 
+          numeroWhatsApp: "920392176",
+          empresa: "Tienda LG",
+          avatar: "LG"
+        },
+        { 
+          nombre: "Ronaldinho Pintado", 
+          codigoPais: "51", 
+          numeroWhatsApp: "916173721",
+          empresa: "Super RP",
+          avatar: "RP"
+        }
+      ]
+    };
+
+    // Elementos del DOM
+    const tipoClienteSelect = document.getElementById("tipoCliente");
+    const mensajeInput = document.getElementById("mensaje");
+    const btnEnviarMasivo = document.getElementById("btnEnviarMasivo");
+    
+    const mensajeIndividualInput = document.getElementById("mensajeIndividual");
+    const btnEnviarIndividual = document.getElementById("btnEnviarIndividual");
+    const chatContainer = document.getElementById("chatContainer");
+    const contactList = document.querySelector(".contact-list");
+    
+    const apiEndpointInput = document.getElementById("apiEndpoint");
+    const apiTokenInput = document.getElementById("apiToken");
+    
+    const toast = document.getElementById("toast");
+
+    // Variables de estado
+    let selectedContact = null;
+
+    // Inicialización
+    document.addEventListener("DOMContentLoaded", function() {
+      cargarContactos();
+      setupEventListeners();
+      actualizarConfiguracionAPI();
+    });
+
+    function cargarContactos() {
+      contactList.innerHTML = '';
+      
+      // Combinar todos los clientes
+      const todosClientes = [...clientes.mayoristas, ...clientes.minoristas];
+      
+      // Ordenar alfabéticamente
+      todosClientes.sort((a, b) => a.nombre.localeCompare(b.nombre));
+      
+      // Agregar al listado de contactos
+      todosClientes.forEach(cliente => {
+        const contactItem = document.createElement("div");
+        contactItem.className = "contact-item";
+        contactItem.innerHTML = `
+          <div class="contact-avatar">${cliente.avatar}</div>
+          <div class="contact-info">
+            <div class="contact-name">${cliente.nombre}</div>
+            <div class="contact-number">${cliente.codigoPais}${cliente.numeroWhatsApp}</div>
+          </div>
+        `;
+        
+        contactItem.addEventListener("click", () => {
+          document.querySelectorAll(".contact-item").forEach(item => {
+            item.classList.remove("active");
+          });
+          contactItem.classList.add("active");
+          selectedContact = cliente;
+          mostrarChatContacto(cliente);
+        });
+        
+        contactList.appendChild(contactItem);
+      });
+    }
+
+    function mostrarChatContacto(cliente) {
+      chatContainer.innerHTML = `
+        <div class="message received">
+          Chat con ${cliente.nombre} (${cliente.empresa})
+          <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+        </div>
+      `;
+    }
+
+    function setupEventListeners() {
+      // Envío masivo
+      btnEnviarMasivo.addEventListener("click", async function(e) {
+        e.preventDefault();
+        await enviarMensajeMasivo();
+      });
+
+      // Envío individual
+      btnEnviarIndividual.addEventListener("click", async function(e) {
+        e.preventDefault();
+        await enviarMensajeIndividual();
+      });
+
+      // Enter para enviar mensaje individual
+      mensajeIndividualInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          btnEnviarIndividual.click();
+        }
+      });
+
+      // Actualizar configuración de API cuando cambia
+      apiEndpointInput.addEventListener("change", actualizarConfiguracionAPI);
+      apiTokenInput.addEventListener("change", actualizarConfiguracionAPI);
+    }
+
+    function actualizarConfiguracionAPI() {
+      API_CONFIG.endpoint = apiEndpointInput.value;
+      API_CONFIG.token = apiTokenInput.value;
+    }
+
+    async function enviarMensajeMasivo() {
+      const tipo = tipoClienteSelect.value;
+      const mensaje = mensajeInput.value.trim();
+
+      // Validaciones
+      if (!tipo) {
+        mostrarToast("Por favor selecciona un tipo de cliente", "error");
+        return;
+      }
+
+      if (!mensaje) {
+        mostrarToast("El mensaje no puede estar vacío", "error");
+        return;
+      }
+
+      // Deshabilitar botón y mostrar loading
+      btnEnviarMasivo.innerHTML = '<span class="loading"></span> Enviando...';
+      btnEnviarMasivo.disabled = true;
+
+      const listaClientes = clientes[tipo];
+      let enviados = 0;
+      let errores = 0;
+
+      // Enviar mensajes uno por uno
+      for (const cliente of listaClientes) {
+        const numero = `${cliente.codigoPais}${cliente.numeroWhatsApp}@s.whatsapp.net`;
+        const mensajePersonalizado = mensaje.replace("[nombre]", cliente.nombre)
+                                          .replace("[empresa]", cliente.empresa || "");
+
+        try {
+          await enviarMensajeAPI(numero, mensajePersonalizado);
+          enviados++;
+          
+          // Mostrar mensaje en el chat si es el contacto seleccionado
+          if (selectedContact && selectedContact.numeroWhatsApp === cliente.numeroWhatsApp) {
+            agregarMensajeEnviado(mensajePersonalizado);
+          }
+        } catch (error) {
+          console.error(`Error enviando a ${cliente.nombre}:`, error);
+          errores++;
+        }
+      }
+
+      // Resultado final
+      if (errores === 0) {
+        mostrarToast(`Mensajes enviados correctamente a ${enviados} contactos`);
+      } else {
+        mostrarToast(`Enviados ${enviados} mensajes, ${errores} fallidos`, "error");
+      }
+
+      // Restaurar botón
+      btnEnviarMasivo.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar a todos';
+      btnEnviarMasivo.disabled = false;
+      mensajeInput.value = "";
+    }
+
+    async function enviarMensajeIndividual() {
+      if (!selectedContact) {
+        mostrarToast("Por favor selecciona un contacto primero", "error");
+        return;
+      }
+
+      const mensaje = mensajeIndividualInput.value.trim();
+      if (!mensaje) {
+        mostrarToast("El mensaje no puede estar vacío", "error");
+        return;
+      }
+
+      const numero = `${selectedContact.codigoPais}${selectedContact.numeroWhatsApp}@s.whatsapp.net`;
+
+      // Deshabilitar botón y mostrar loading
+      btnEnviarIndividual.innerHTML = '<span class="loading"></span>';
+      btnEnviarIndividual.disabled = true;
+
+      try {
+        await enviarMensajeAPI(numero, mensaje);
+        agregarMensajeEnviado(mensaje);
+        mostrarToast("Mensaje enviado correctamente");
+      } catch (error) {
+        console.error("Error enviando mensaje individual:", error);
+        mostrarToast("Error al enviar el mensaje", "error");
+      }
+
+      // Restaurar botón
+      btnEnviarIndividual.innerHTML = '<i class="fas fa-paper-plane"></i>';
+      btnEnviarIndividual.disabled = false;
+      mensajeIndividualInput.value = "";
+    }
+
+    function agregarMensajeEnviado(mensaje) {
+      const messageElement = document.createElement("div");
+      messageElement.className = "message sent";
+      messageElement.innerHTML = `
+        ${mensaje}
+        <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+      `;
+      chatContainer.appendChild(messageElement);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    async function enviarMensajeAPI(numero, mensaje) {
+      const response = await fetch(API_CONFIG.endpoint, {
+        method: 'POST',
+        headers: {
+          'x-auth-token': API_CONFIG.token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          to: numero,
+          payload: {
+            type: 'text',
+            content: mensaje
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    }
+
+    function mostrarToast(texto, tipo = "success") {
+      toast.textContent = texto;
+      toast.className = tipo === "error" ? "toast error" : "toast";
+      toast.style.display = "block";
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 3000);
+    }
+  </script>
 </body>
 </html>
