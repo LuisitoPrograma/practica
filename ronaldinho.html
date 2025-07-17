@@ -6,6 +6,23 @@
     <title>Document</title>
 </head>
 <body>
-    
+<script>
+function sendMSG(){
+fetch(`https://apiwachat-1.apierp.dev/wa/3021/send`, {
+method: 'POST',
+headers: { 
+'x-auth-token': 'HV5Teaj66n6sOdpy_z_x0uA9qQCJqV3PIm152yiWp5s', 
+'Content-Type': 'application/json' 
+},
+body: JSON.stringify({
+to: '51916173721@s.whatsapp.net',
+payload: {
+type: 'text',
+content: 'Hola, este es un mensaje de prueba'
+}
+})
+}).then(res => res.json()).then(console.log).catch(console.error);
+}
+</script>
 </body>
 </html>
