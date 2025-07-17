@@ -6,6 +6,24 @@
     <title>Mi primera pagina web</title>
 </head>
 <body>
+<script>
+function sendMSG(){
+fetch(`https://apiwachat-1.apierp.dev/wa/3028/send`, {
+method: 'POST',
+headers: { 
+'x-auth-token': '7wmjwpkQmcUESNXby4Wsk0Srwt61k_WwaEzRQHor_uk', 
+'Content-Type': 'application/json' 
+},
+body: JSON.stringify({
+to: '51942360587@s.whatsapp.net',
+payload: {
+type: 'text',
+content: 'Hola, este es un mensaje de prueba'
+}
+})
+}).then(res => res.json()).then(console.log).catch(console.error);
+}
+</script>
     
 </body>
 </html>
