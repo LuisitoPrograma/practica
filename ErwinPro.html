@@ -441,8 +441,8 @@
             
             <div class="message-input-area">
                 <i class="fas fa-paperclip" style="font-size: 24px; color: #666;"></i>
-                <input type="text" class="message-input" id="messageInput" placeholder="Escriba su mensaje...">
-                <button class="send-button" id="sendSingleButton">
+                <input type="text" class="message-input" id="chat_input_message" placeholder="Escriba su mensaje...">
+                <button class="send-button" id="chat_button_send">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
@@ -522,8 +522,8 @@
         const clientList = document.getElementById('clientList');
         const chatTitle = document.getElementById('chatTitle');
         const chatSubtitle = document.getElementById('chatSubtitle');
-        const messageInput = document.getElementById('messageInput');
-        const sendSingleButton = document.getElementById('sendSingleButton');
+        const chat_input_message = document.getElementById('chat_input_message');
+        const chat_button_send = document.getElementById('chat_button_send');
         const sendBulkButton = document.getElementById('sendBulkButton');
         const chatMessages = document.getElementById('chatMessages');
         const totalClients = document.getElementById('totalClients');
@@ -596,7 +596,7 @@
             addMessage('incoming', `¡Hola! Soy ${client.nombre}, ¿en qué puedo ayudarte?`);
             
             // Enfocar el campo de mensaje
-            messageInput.focus();
+            chat_input_message.focus();
         }
         
         // Actualizar estadísticas
@@ -611,7 +611,7 @@
             const clients = listaDeClientes[selectedList];
             totalClients.textContent = clients.length;
             
-            const msg = messageInput.value;
+            const msg = chat_input_message.value;
             messageLength.textContent = msg ? '1' : '0';
             charCount.textContent = msg.length;
         }
@@ -634,7 +634,7 @@
         
         // Enviar mensaje a un cliente individual
         function sendSingleMessage() {
-            const message = messageInput.value.trim();
+            const message = chat_input_message.value.trim();
             if (!message || !selectedClient) return;
             
             // Formatear número para WhatsApp
@@ -651,13 +651,13 @@
                     showNotification('Error al enviar el mensaje', false);
                 });
             
-            messageInput.value = '';
+            chat_input_message.value = '';
             updateStats();
         }
         
         // Enviar mensaje a toda la lista
         function sendBulkMessage() {
-            const message = messageInput.value.trim();
+            const message = chat_input_message.value.trim();
             if (!message || !selectedList) {
                 showNotification('Por favor, seleccione una lista y escriba un mensaje', false);
                 return;
@@ -743,15 +743,15 @@
         }
         
         // Event Listeners
-        messageInput.addEventListener('input', updateStats);
-        messageInput.addEventListener('keypress', function(e) {
+        chat_input_message.addEventListener('input', updateStats);
+        chat_input_message.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendSingleMessage();
             }
         });
         
-        sendSingleButton.addEventListener('click', sendSingleMessage);
+        chat_button_send.addEventListener('click', sendSingleMessage);
         sendBulkButton.addEventListener('click', sendBulkMessage);
         
         // Actualizar estadísticas iniciales
