@@ -7,6 +7,42 @@
 </head>
 <body>
 <script>
+
+const listaDeClientes = {
+  clientesMayoristas: [
+    {
+      whatsapp: "947339263",
+      codigoPais: "51",
+      nombre: "Sucursales Riofrio"
+    },
+    {
+      whatsapp: "942360587",
+      codigoPais: "51",
+      nombre: "Industrias Sandoval"
+    },
+    
+  ],
+  clientesMinoristas: [
+    {
+      whatsapp: "916173721",
+      codigoPais: "51",
+      nombre: "Ronaldinho"
+    },
+    {
+      whatsapp: "920392176",
+      codigoPais: "51",
+      nombre: "Leo"
+    },
+  ]
+};
+
+console.log(listaDeClientes.clientesMayoristas[0].nombre); // "Empresa Andina SAC"
+
+// Listar todos los números de WhatsApp de clientes minoristas
+listaDeClientes.clientesMinoristas.forEach(cliente => {
+  console.log(`${cliente.codigoPais} ${cliente.whatsapp} — ${cliente.nombre}`);
+});
+
 function sendMSG(){
 fetch(`https://apiwachat-1.apierp.dev/wa/3030/send`, {
 method: 'POST',
@@ -24,5 +60,60 @@ content: 'Hola, eres un crack'
 }).then(res => res.json()).then(console.log).catch(console.error);
 }
 </script>
+<h2>Escoge lista de clientes</h2>
+  <!-- Para selección múltiple deja "multiple"; si quieres solo una opción, quita ese atributo -->
+  <select id="selectorListas" multiple size="2">
+    <option value="clientesMayoristas">Clientes Mayoristas</option>
+    <option value="clientesMinoristas">Clientes Minoristas</option>
+  </select>
+
+  <h2>Clientes seleccionados</h2>
+  <select id="selectorClientes" size="5">
+    <!-- Aquí se añadirán las opciones de clientes -->
+  </select>
+
+  <script>
+    // El objeto con las dos listas:
+    const lista = {
+      clientesMayoristas: [
+        { whatsapp: "987654321", codigoPais: "+51", nombre: "Empresa Andina SAC" },
+        { whatsapp: "912345678", codigoPais: "+57", nombre: "Distribuciones Bogotá" },
+        { whatsapp: "998877665", codigoPais: "+54", nombre: "Mayorista Buenos Aires" }
+      ],
+      clientesMinoristas: [
+        { whatsapp: "912233445", codigoPais: "+51", nombre: "María Pérez" },
+        { whatsapp: "919988776", codigoPais: "+52", nombre: "Jorge López" },
+        { whatsapp: "931122334", codigoPais: "+58", nombre: "Ana Gómez" }
+      ]
+    };
+
+    const selectorListas   = document.getElementById('selectorListas');
+    const selectorClientes = document.getElementById('selectorClientes');
+
+    function actualizarClientes() {
+      // Vaciamos el segundo select
+      selectorClientes.innerHTML = '';
+      // Recogemos qué listas han sido seleccionadas
+      const seleccionadas = Array.from(selectorListas.selectedOptions)
+                                  .map(opt => opt.value);
+
+      // Para cada lista escogida, añadimos sus clientes
+      seleccionadas.forEach(listaKey => {
+        const lista = listaDeClientes[listaKey];
+        lista.forEach(cliente => {
+          const opt = document.createElement('option');
+          opt.value = cliente.whatsapp;
+          opt.textContent = `${cliente.nombre} (${cliente.codigoPais} ${cliente.whatsapp})`;
+          selectorClientes.appendChild(opt);
+        });
+      });
+    }
+
+    // Actualiza al cambiar la selección
+    selectorListas.addEventListener('change', actualizarClientes);
+
+    // (Opcional) inicializar con la primera lista
+    actualizarClientes();
+  </script>
 </body>
 </html>
