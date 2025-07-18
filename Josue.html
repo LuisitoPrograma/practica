@@ -1,29 +1,219 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi primera pagina web</title>
+    <title>Enviador Masivo de WhatsApp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: #e5ddd5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+            background-color: #fff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        .cabecera {
+            background-color: #075e54;
+            color: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .grupo-formulario {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f2f2f2;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .entrada-mensaje {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: #f5f5f5;
+            border-radius: 21px;
+            margin-top: 10px;
+        }
+        .entrada-mensaje textarea {
+            flex: 1;
+            border: none;
+            background: transparent;
+            resize: none;
+            outline: none;
+            font-size: 14px;
+            padding: 8px 0;
+            max-height: 100px;
+            min-height: 40px;
+        }
+        .boton-enviar {
+            background-color: #075e54;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        .boton-enviar:hover {
+            background-color: #128c7e;
+        }
+        .estado {
+            padding: 15px 20px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-<script>
-function sendMSG(){
-fetch(`https://apiwachat-1.apierp.dev/wa/3028/send`, {
-method: 'POST',
-headers: { 
-'x-auth-token': '7wmjwpkQmcUESNXby4Wsk0Srwt61k_WwaEzRQHor_uk', 
-'Content-Type': 'application/json' 
-},
-body: JSON.stringify({
-to: '51942360587@s.whatsapp.net',
-payload: {
-type: 'text',
-content: 'Hola, este es un mensaje de prueba'
-}
-})
-}).then(res => res.json()).then(console.log).catch(console.error);
-}
-</script>
-    
+    <div class="contenedor">
+        <div class="cabecera">
+            Enviador Masivo de WhatsApp
+        </div>
+        <div class="grupo-formulario">
+            <label for="lista-clientes">Seleccionar lista de clientes:</label>
+            <select id="lista-clientes">
+                <option value="">-- Seleccione una lista --</option>
+                <option value="clientesMayoristas">Clientes Mayoristas</option>
+                <option value="clientesMinoristas">Clientes Minoristas</option>
+            </select>
+            
+            <label for="mensaje">Mensaje:</label>
+            <div class="entrada-mensaje">
+                <textarea id="mensaje" placeholder="Escriba su mensaje aquí..." rows="1"></textarea>
+                <button class="boton-enviar" onclick="enviarMensajesMasivos()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="estado" id="estado">
+            Listo para enviar mensajes
+        </div>
+    </div>
+
+    <script>
+        const listaDeClientes = {
+            clientesMayoristas: [
+                {
+                    whatsapp: '920392176',
+                    codigoPais: '51',
+                    nombre: 'Leonardo Giron'
+                },
+                {
+                    whatsapp: '916173721',
+                    codigoPais: '51',
+                    nombre: 'Ronaldihno Pintado.'
+                },
+            ],
+            clientesMinoristas: [
+                {
+                    whatsapp: '942360587',
+                    codigoPais: '51',
+                    nombre: 'Josue More'
+                },
+                {
+                    whatsapp: '947339263',
+                    codigoPais: '51',
+                    nombre: 'Erwin Riofrio'
+                },
+            ]
+        };
+
+        function enviarMensajesMasivos() {
+            const listaClientes = document.getElementById('lista-clientes').value;
+            const mensaje = document.getElementById('mensaje').value.trim();
+            const elementoEstado = document.getElementById('estado');
+            
+            if (!listaClientes) {
+                elementoEstado.textContent = "Por favor seleccione una lista de clientes";
+                return;
+            }
+            
+            if (!mensaje) {
+                elementoEstado.textContent = "Por favor escriba un mensaje";
+                return;
+            }
+            
+            const clientes = listaDeClientes[listaClientes];
+            if (!clientes || clientes.length === 0) {
+                elementoEstado.textContent = "No hay clientes en la lista seleccionada";
+                return;
+            }
+            
+            elementoEstado.textContent = `Enviando mensajes a ${clientes.length} clientes...`;
+            
+            let exitosos = 0;
+            let fallidos = 0;
+            
+            clientes.forEach((cliente, index) => {
+                const numeroTelefono = `${cliente.codigoPais}${cliente.whatsapp}@s.whatsapp.net`;
+                
+                fetch(`https://apiwachat-1.apierp.dev/wa/3028/send`, {
+                    method: 'POST',
+                    headers: { 
+                        'x-auth-token': '7wmjwpkQmcUESNXby4Wsk0Srwt61k_WwaEzRQHor_uk', 
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify({
+                        to: numeroTelefono,
+                        payload: {
+                            type: 'text',
+                            content: mensaje
+                        }
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    exitosos++;
+                    console.log(`Mensaje enviado a ${cliente.nombre}:`, data);
+                })
+                .catch(error => {
+                    fallidos++;
+                    console.error(`Error enviando a ${cliente.nombre}:`, error);
+                })
+                .finally(() => {
+                    if (exitosos + fallidos === clientes.length) {
+                        elementoEstado.textContent = `Mensajes enviados: ${exitosos} exitosos, ${fallidos} fallidos`;
+                    }
+                    selectLista.value = ""
+                    document.getElementById("mensaje").value = "" ;
+                });
+            });
+        }
+
+        // Ajustar automáticamente el área de texto mientras se escribe
+        document.getElementById('mensaje').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    </script>
 </body>
 </html>
