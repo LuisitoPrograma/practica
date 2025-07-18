@@ -245,7 +245,7 @@
         });
         
         // Función para enviar el correo
-        async function sendBirthdayCard() {
+         async function sendBirthdayCard() {
             const recipientName = document.getElementById('recipient-name').value.trim();
             const recipientEmail = document.getElementById('recipient-email').value.trim();
             const personalMessage = document.getElementById('personal-message').value.trim();
@@ -288,7 +288,10 @@
             `;
             
             // Enviar el correo
-            // Enviar el correo y manejar la respuesta
+            await sendSimpleEmail(recipientEmail, `¡Feliz Cumpleaños ${recipientName}!`, emailHtml);
+            
+            alert('¡Carta de cumpleaños enviada con éxito!');
+
             const success = await sendSimpleEmail(recipientEmail, `¡Feliz Cumpleaños ${recipientName}!`, emailHtml);
             
             if (success) {
@@ -299,6 +302,7 @@
         }
         
         // Función de envío corregida
+         // Función de envío corregida
         async function sendSimpleEmail(to, subject, htmlBody) {
             const payload = {
                 setAuthToken: 'Cr6ZdDPfZ1Bw1IlIahm9y9618ECknHeRuKnEo5dJn7Y',
