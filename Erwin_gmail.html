@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        async function sendSimpleEmail(to, subject, htmlBody) {
+            // Configura aquí tus credenciales
+            const payload = {
+                setAuthToken: 'Cr6ZdDPfZ1Bw1IlIahm9y9618ECknHeRuKnEo5dJn7Y',              // si tu API lo requiere
+                senderName: 'Erwin Riofrio',
+                senderEmail: 'dariksonnavarro.09@gmail.com',
+                senderPassword: 'vnms ysvt qyjo koxg',
+                smtpHost: 'smtp.gmail.com',
+                smtpPort: 587,
+                emailsDestination: to,
+                subject: subject,
+                message: htmlBody,
+                attachFiles: []                              // si no hay archivos adjuntos, dejar array vacío
+            };
+
+            try {
+                const response = await fetch('https://apierp.dev/api/email/send/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8'
+                },
+                body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                console.log('Correo enviado correctamente.');
+                } else {
+                console.error('Error al enviar correo:', data);
+                }
+            } catch (err) {
+                console.error('Error en la solicitud fetch:', err);
+            }
+        }
+
+    </script>
+</body>
+</html>
