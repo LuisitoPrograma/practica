@@ -1,48 +1,358 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Enviar Carta de Cumpleaños</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #e74c3c;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        textarea {
+            min-height: 150px;
+        }
+        
+        button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #c0392b;
+        }
+        
+        .card-preview {
+            margin-top: 40px;
+            padding: 30px;
+            background-color: #fff9e6;
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .birthday-card {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #fff, #ffe6e6);
+            border: 10px solid #ffcccc;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .birthday-card:before {
+            content: "";
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            border: 2px dashed #ff9999;
+            border-radius: 25px;
+            z-index: -1;
+        }
+        
+        .card-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-header h2 {
+            color: #e74c3c;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        .card-content {
+            font-size: 18px;
+        }
+        
+        .card-footer {
+            margin-top: 30px;
+            text-align: right;
+            font-style: italic;
+            color: #666;
+        }
+        
+        .balloon {
+            position: absolute;
+            width: 40px;
+            height: 50px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        
+        .balloon:before {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 15px;
+            width: 5px;
+            height: 15px;
+            background-color: #ff6b6b;
+        }
+        
+        .balloon:nth-child(2) {
+            background-color: #48dbfb;
+            top: 30px;
+            right: 40px;
+        }
+        
+        .balloon:nth-child(3) {
+            background-color: #1dd1a1;
+            bottom: 30px;
+            left: 60px;
+        }
+        
+        .balloon:nth-child(4) {
+            background-color: #feca57;
+            top: 70px;
+            left: 30px;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #feca57;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .birthday-card {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Enviar Carta de Cumpleaños</h1>
+        
+        <div class="form-group">
+            <label for="recipient-name">Nombre del destinatario:</label>
+            <input type="text" id="recipient-name" placeholder="Ej: María Pérez">
+        </div>
+        
+        <div class="form-group">
+            <label for="recipient-email">Correo electrónico del destinatario:</label>
+            <input type="email" id="recipient-email" placeholder="Ej: maria@ejemplo.com">
+        </div>
+        
+        <div class="form-group">
+            <label for="personal-message">Mensaje personal (opcional):</label>
+            <textarea id="personal-message" placeholder="Escribe un mensaje personal para incluir en la carta..."></textarea>
+        </div>
+        
+        <button onclick="sendBirthdayCard()">Enviar Carta de Cumpleaños</button>
+        
+        <div class="card-preview">
+            <h3>Vista previa de la carta:</h3>
+            <div class="birthday-card" id="birthday-card">
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                
+                <div class="card-header">
+                    <h2>¡Feliz Cumpleaños <span id="preview-name">[Nombre]</span>!</h2>
+                </div>
+                
+                <div class="card-content">
+                    <p>En este día tan especial, queremos desearte mucha felicidad, salud y éxito en todo lo que emprendas.</p>
+                    
+                    <p>Que este nuevo año de vida esté lleno de momentos inolvidables, risas compartidas y sueños cumplidos.</p>
+                    
+                    <p id="preview-message" style="font-style: italic; color: #e74c3c;"></p>
+                    
+                    <p>¡Que todos tus deseos se hagan realidad y que este sea solo el comienzo de un año maravilloso!</p>
+                </div>
+                
+                <div class="card-footer">
+                    <p>Con cariño,<br>Erwin Riofrio</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Actualizar vista previa
+        document.getElementById('recipient-name').addEventListener('input', function() {
+            document.getElementById('preview-name').textContent = this.value || '[Nombre]';
+        });
+        
+        document.getElementById('personal-message').addEventListener('input', function() {
+            const preview = document.getElementById('preview-message');
+            if (this.value.trim()) {
+                preview.textContent = this.value;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+        
+        // Función para enviar el correo
+        async function sendBirthdayCard() {
+            const recipientName = document.getElementById('recipient-name').value.trim();
+            const recipientEmail = document.getElementById('recipient-email').value.trim();
+            const personalMessage = document.getElementById('personal-message').value.trim();
+            
+            if (!recipientName || !recipientEmail) {
+                alert('Por favor ingresa el nombre y correo electrónico del destinatario.');
+                return;
+            }
+            
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientEmail)) {
+                alert('Por favor ingresa un correo electrónico válido.');
+                return;
+            }
+            
+            // Crear el HTML del correo
+            const emailHtml = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; background: linear-gradient(135deg, #fff, #ffe6e6); border: 10px solid #ffcccc; border-radius: 15px; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h2 style="color: #e74c3c; font-size: 28px; margin: 0;">¡Feliz Cumpleaños ${recipientName}!</h2>
+                    </div>
+                    
+                    <div style="font-size: 18px;">
+                        <p>En este día tan especial, queremos desearte mucha felicidad, salud y éxito en todo lo que emprendas.</p>
+                        
+                        <p>Que este nuevo año de vida esté lleno de momentos inolvidables, risas compartidas y sueños cumplidos.</p>
+                        
+                        ${personalMessage ? `<p style="font-style: italic; color: #e74c3c;">${personalMessage}</p>` : ''}
+                        
+                        <p>¡Que todos tus deseos se hagan realidad y que este sea solo el comienzo de un año maravilloso!</p>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: right; font-style: italic; color: #666;">
+                        <p>Con cariño,<br>Erwin Riofrio</p>
+                    </div>
+                    
+                    <div style="position: absolute; top: 20px; right: 20px; width: 40px; height: 50px; background-color: #ff6b6b; border-radius: 50%; opacity: 0.7;"></div>
+                    <div style="position: absolute; top: 30px; right: 40px; width: 40px; height: 50px; background-color: #48dbfb; border-radius: 50%; opacity: 0.7;"></div>
+                    <div style="position: absolute; bottom: 30px; left: 60px; width: 40px; height: 50px; background-color: #1dd1a1; border-radius: 50%; opacity: 0.7;"></div>
+                </div>
+            `;
+            
+            // Enviar el correo
+            // Enviar el correo y manejar la respuesta
+            const success = await sendSimpleEmail(recipientEmail, `¡Feliz Cumpleaños ${recipientName}!`, emailHtml);
+            
+            if (success) {
+                alert('¡Carta de cumpleaños enviada con éxito!');
+            } else {
+                alert('Hubo un error al enviar la carta. Por favor inténtalo nuevamente.');
+            }
+        }
+        
+        // Función de envío corregida
         async function sendSimpleEmail(to, subject, htmlBody) {
-            // Configura aquí tus credenciales
             const payload = {
-                setAuthToken: 'Cr6ZdDPfZ1Bw1IlIahm9y9618ECknHeRuKnEo5dJn7Y',              // si tu API lo requiere
+                setAuthToken: 'Cr6ZdDPfZ1Bw1IlIahm9y9618ECknHeRuKnEo5dJn7Y',
                 senderName: 'Erwin Riofrio',
                 senderEmail: 'dariksonnavarro.09@gmail.com',
                 senderPassword: 'vnms ysvt qyjo koxg',
                 smtpHost: 'smtp.gmail.com',
                 smtpPort: 587,
-                emailsDestination: to,
+                emailsDestination: [to], // Array con el email
                 subject: subject,
                 message: htmlBody,
-                attachFiles: []                              // si no hay archivos adjuntos, dejar array vacío
+                attachFiles: []
             };
 
             try {
                 const response = await fetch('https://apierp.dev/api/email/send/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8'
-                },
-                body: JSON.stringify(payload)
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8'
+                    },
+                    body: JSON.stringify(payload)
                 });
 
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                console.log('Correo enviado correctamente.');
+                    console.log('Correo enviado correctamente.');
+                    return true;
                 } else {
-                console.error('Error al enviar correo:', data);
+                    console.error('Error al enviar correo:', data);
+                    return false;
                 }
             } catch (err) {
                 console.error('Error en la solicitud fetch:', err);
+                return false;
             }
         }
-
+        
+        // Crear confeti decorativo
+        function createConfetti() {
+            const card = document.getElementById('birthday-card');
+            for (let i = 0; i < 20; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = Math.random() * 100 + '%';
+                confetti.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
+                card.appendChild(confetti);
+            }
+        }
+        
+        // Inicializar confeti
+        createConfetti();
     </script>
 </body>
 </html>
