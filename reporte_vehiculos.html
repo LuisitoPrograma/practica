@@ -7,28 +7,38 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            padding: 20px;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         h1 {
+            margin: 0;
             color: #333;
-            text-align: center;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        .btn:hover {
+            background-color: #0056b3;
         }
         .loading {
             text-align: center;
@@ -36,34 +46,82 @@
             font-style: italic;
             color: #666;
         }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #333;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+        @media (max-width: 600px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .btn {
+                margin-top: 10px;
+            }
+            th, td {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Reporte de Vehículos</h1>
-    <div id="loading" class="loading">Cargando datos de vehículos...</div>
-    <div id="vehiculos-container" style="display: none;">
-        <table id="tabla-vehiculos">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Marca</th>
-                    <th>Placa</th>
-                    <th>Color</th>
-                    <th>Año</th>
-                    <th>Kilometraje</th>
-                </tr>
-            </thead>
-            <tbody id="tabla-body">
-                <!-- Los datos se cargarán aquí -->
-            </tbody>
-        </table>
+    <div class="container">
+        <div class="header-container">
+            <h1>Reporte de Vehículos</h1>
+            <a href="vehiculos.html" class="btn">
+                ← Volver al Administrador
+            </a>
+        </div>
+        
+        <div id="loading" class="loading">Cargando datos de vehículos...</div>
+        
+        <div id="vehiculos-container" style="display: none;">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Marca</th>
+                            <th>Placa</th>
+                            <th>Color</th>
+                            <th>Año</th>
+                            <th>Kilometraje</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-body">
+                        <!-- Los datos se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Hacer la petición a la API
-            fetch('obtener_vehiculos.php')
+            fetch('crud_vehiculos.php')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Error en la respuesta de la red');
@@ -81,17 +139,17 @@
                     const tbody = document.getElementById('tabla-body');
                     
                     // Procesar cada vehículo
-                    data.vehiculos.forEach(vehiculo => {
+                    data.data.forEach(vehiculo => {
                         const row = document.createElement('tr');
                         
                         row.innerHTML = `
-                            <td>${vehiculo.vehiculoId}</td>
-                            <td>${vehiculo.vehiculoNombre}</td>
-                            <td>${vehiculo.vehiculoMarca}</td>
-                            <td>${vehiculo.vehiculoPlaca}</td>
-                            <td>${vehiculo.vehiculoColor}</td>
-                            <td>${vehiculo.vehiculoAnio}</td>
-                            <td>${vehiculo.vehiculoKilometraje.toLocaleString()} km</td>
+                            <td>${vehiculo.id}</td>
+                            <td>${vehiculo.nombre}</td>
+                            <td>${vehiculo.marca}</td>
+                            <td>${vehiculo.placa}</td>
+                            <td>${vehiculo.color}</td>
+                            <td>${vehiculo.año}</td>
+                            <td>${vehiculo.kilometraje.toLocaleString()} km</td>
                         `;
                         
                         tbody.appendChild(row);

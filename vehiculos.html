@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Vehículos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        .form-container {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        #form-title {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+            margin: 0 10px 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #2c3e50;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .action-buttons {
+            white-space: nowrap;
+        }
+        
+        .action-buttons button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            font-size: 13px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+            margin-top: 15px;
+            text-align: right;
+        }
+        
+        .close {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-group {
+                min-width: 100%;
+                margin: 0 0 15px;
+            }
+            
+            .action-buttons {
+                white-space: normal;
+            }
+            
+            .action-buttons button {
+                display: block;
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background-color: #138496;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Administración de Vehículos</h1>
+            <a href="reporte_vehiculos.html" class="btn btn-info">
+                <i class="bi bi-file-earmark-text"></i> Ver Reporte
+            </a>
+        </div>
+        
+        <!-- Formulario para agregar/editar -->
+        <div class="form-container">
+            <h3 id="form-title">Agregar Nuevo Vehículo</h3>
+            <form id="vehiculo-form">
+                <input type="hidden" id="vehiculo-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="marca">Marca</label>
+                        <input type="text" id="marca" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="placa">Placa</label>
+                        <input type="text" id="placa" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="color">Color</label>
+                        <input type="text" id="color" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="año">Año</label>
+                        <input type="number" id="año" min="1900" max="2099" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="kilometraje">Kilometraje</label>
+                        <input type="number" step="0.01" id="kilometraje" min="0" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancel-btn" style="display: none;">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Tabla de vehículos -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Marca</th>
+                        <th>Placa</th>
+                        <th>Color</th>
+                        <th>Año</th>
+                        <th>Kilometraje</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="vehiculos-table">
+                    <!-- Los datos se cargarán aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h3>Confirmar Eliminación</h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este vehículo?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="modal-cancel">Cancelar</button>
+                <button class="btn-danger" id="confirm-delete">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('vehiculo-form');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const formTitle = document.getElementById('form-title');
+            const modal = document.getElementById('confirmModal');
+            const modalCancel = document.getElementById('modal-cancel');
+            const closeBtn = document.querySelector('.close');
+            let currentId = null;
+            let deleteId = null;
+            
+            // Cargar vehículos al iniciar
+            loadVehiculos();
+            
+            // Manejar envío del formulario
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveVehiculo();
+            });
+            
+            // Manejar botón cancelar
+            cancelBtn.addEventListener('click', function() {
+                resetForm();
+            });
+            
+            // Manejar confirmación de eliminación
+            document.getElementById('confirm-delete').addEventListener('click', function() {
+                deleteVehiculo(deleteId);
+                modal.style.display = 'none';
+            });
+            
+            // Manejar cierre del modal
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            modalCancel.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            // Cerrar modal al hacer clic fuera
+            window.addEventListener('click', function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Función para cargar vehículos
+            function loadVehiculos() {
+                fetch('crud_vehiculos.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            renderTable(data.data);
+                        } else {
+                            alert('Error al cargar vehículos');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+            
+            // Función para renderizar la tabla
+            function renderTable(vehiculos) {
+                const tableBody = document.getElementById('vehiculos-table');
+                tableBody.innerHTML = '';
+                
+                vehiculos.forEach(vehiculo => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${vehiculo.id}</td>
+                        <td>${vehiculo.nombre}</td>
+                        <td>${vehiculo.marca}</td>
+                        <td>${vehiculo.placa}</td>
+                        <td>${vehiculo.color}</td>
+                        <td>${vehiculo.año}</td>
+                        <td>${vehiculo.kilometraje.toLocaleString()} km</td>
+                        <td class="action-buttons">
+                            <button class="btn-warning edit-btn" data-id="${vehiculo.id}">Editar</button>
+                            <button class="btn-danger delete-btn" data-id="${vehiculo.id}">Eliminar</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                // Agregar eventos a los botones
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        editVehiculo(this.getAttribute('data-id'));
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        deleteId = this.getAttribute('data-id');
+                        modal.style.display = 'block';
+                    });
+                });
+            }
+            
+            // Función para guardar vehículo (crear o actualizar)
+            function saveVehiculo() {
+                const vehiculo = {
+                    nombre: document.getElementById('nombre').value,
+                    marca: document.getElementById('marca').value,
+                    placa: document.getElementById('placa').value,
+                    color: document.getElementById('color').value,
+                    año: parseInt(document.getElementById('año').value),
+                    kilometraje: parseFloat(document.getElementById('kilometraje').value)
+                };
+                
+                if (currentId) {
+                    vehiculo.id = currentId;
+                }
+                
+                fetch('crud_vehiculos.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(vehiculo)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadVehiculos();
+                        resetForm();
+                    } else {
+                        alert('Error al guardar: ' + (data.error || 'Error desconocido'));
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+            
+            // Función para editar vehículo
+            function editVehiculo(id) {
+                fetch('crud_vehiculos.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const vehiculo = data.data.find(v => v.id == id);
+                            if (vehiculo) {
+                                currentId = vehiculo.id;
+                                document.getElementById('nombre').value = vehiculo.nombre;
+                                document.getElementById('marca').value = vehiculo.marca;
+                                document.getElementById('placa').value = vehiculo.placa;
+                                document.getElementById('color').value = vehiculo.color;
+                                document.getElementById('año').value = vehiculo.año;
+                                document.getElementById('kilometraje').value = vehiculo.kilometraje;
+                                
+                                formTitle.textContent = 'Editar Vehículo';
+                                cancelBtn.style.display = 'inline-block';
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+            
+            // Función para eliminar vehículo
+            function deleteVehiculo(id) {
+                fetch(`crud_vehiculos.php?id=${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadVehiculos();
+                    } else {
+                        alert('Error al eliminar');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+            
+            // Función para resetear el formulario
+            function resetForm() {
+                form.reset();
+                currentId = null;
+                formTitle.textContent = 'Agregar Nuevo Vehículo';
+                cancelBtn.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
