@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lista de Alumnos</title>
+      <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 0 auto;
+            max-width: 95%;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            background: white;
+        }
+
+        #tablaAlumnos {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            background: white;
+        }
+
+        #tablaAlumnos thead {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        #tablaAlumnos th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        #tablaAlumnos tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: var(--transition);
+        }
+
+        #tablaAlumnos tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        #tablaAlumnos tbody tr:hover {
+            background-color: rgba(72, 149, 239, 0.1);
+            transform: translateY(-2px);
+        }
+
+        #tablaAlumnos td {
+            padding: 1rem;
+            color: #555;
+        }
+
+        #tablaAlumnos tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #tablaAlumnos tbody tr:hover {
+            background-color: #f1f7fe;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            #tablaAlumnos th, 
+            #tablaAlumnos td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Estilos para el estado de carga */
+        .loading {
+            position: relative;
+            min-height: 100px;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Mensaje de error */
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            color: #dc3545;
+            background-color: #f8d7da;
+            border-radius: var(--border-radius);
+            margin: 1rem auto;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Lista de Alumnos</h2>
+    <div class="table-container">
+        <table id="tablaAlumnos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>Fecha Nac.</th>
+                    <th>Edad</th>
+                    <th>Escuela</th>
+                    <th>Ciclo</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>Creado en</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí se agregarán filas dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function generarTablaAlumnos() {
+            const tbody = document.querySelector('#tablaAlumnos tbody');
+            tbody.innerHTML = '<tr class="loading"><td colspan="11"></td></tr>';
+            
+            fetch('obtener_a.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la solicitud: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                const alumnos = data.setalumnos; // según el JSON que devuelve PHP
+                tbody.innerHTML = ''; // limpiar tabla
+
+                if (alumnos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 2rem;">No hay alumnos registrados</td></tr>';
+                    return;
+                }
+
+                alumnos.forEach(alumno => {
+                    const fila = document.createElement('tr');
+                    fila.innerHTML = `
+                        <td>${alumno.setalumnoId}</td>
+                        <td>${alumno.setalumnoNombre}</td>
+                        <td>${alumno.setalumnoApellidos}</td>
+                        <td>${formatDate(alumno.setalumnoFechaNacimiento)}</td>
+                        <td>${alumno.setalumnoEdad}</td>
+                        <td>${alumno.setalumnoEscuela}</td>
+                        <td>${alumno.setalumnoCiclo}</td>
+                        <td><a href="mailto:${alumno.setalumnoCorreo}">${alumno.setalumnoCorreo}</a></td>
+                        <td>${alumno.setalumnoTelefono}</td>
+                        <td>${alumno.setalumnoDireccion}</td>
+                        <td>${formatDateTime(alumno.setalumnoCreado)}</td>
+                    `;
+                    tbody.appendChild(fila);
+                });
+            })
+            .catch(error => {
+                console.error('Error al obtener los alumnos:', error);
+                tbody.innerHTML = '<tr><td colspan="11" class="error-message">Error al cargar los datos. Por favor, intente nuevamente.</td></tr>';
+            });
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        }
+
+        function formatDateTime(datetimeString) {
+            if (!datetimeString) return '';
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return new Date(datetimeString).toLocaleDateString('es-ES', options);
+        }
+
+        // Ejecutar al cargar la página
+        window.onload = generarTablaAlumnos;
+    </script>
+    
+</body>
+</html>
