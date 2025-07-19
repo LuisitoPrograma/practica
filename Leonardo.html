@@ -1,480 +1,1336 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WhatsApp Message Sender</title>
-  <style>
-    /* WhatsApp Color Scheme */
-    :root {
-      --wa-primary: #075E54;
-      --wa-secondary: #128C7E;
-      --wa-accent: #25D366;
-      --wa-bg: #E5DDD5;
-      --wa-message-out: #DCF8C6;
-      --wa-message-in: #FFFFFF;
-      --wa-text: #3B4A54;
-      --wa-light-text: #667781;
-      --wa-input-bg: #F0F2F5;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envío Masivo WhatsApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+        }
+        
+        :root {
+            --whatsapp-green: #128C7E;
+            --whatsapp-light: #25D366;
+            --whatsapp-dark: #075E54;
+            --whatsapp-blue: #34B7F1;
+            --chat-bg: #E5DDD5;
+            --sidebar-bg: #F0F2F5;
+            --outgoing-bg: #DCF8C6;
+            --incoming-bg: #FFFFFF;
+            --border-color: #E0E0E0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--whatsapp-green), var(--whatsapp-dark));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            height: 90vh;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 35%;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background-color: var(--sidebar-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            color: var(--whatsapp-green);
+            font-size: 24px;
+        }
+        
+        .logo h1 {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        /* List Selection */
+        .list-selection {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .list-selection h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .list-selector {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            background: white;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .list-selector:focus {
+            border-color: var(--whatsapp-green);
+        }
+        
+        /* Client List */
+        .client-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+        
+        .client-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .client-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .client-item.selected {
+            background: #e8f5e9;
+        }
+        
+        .client-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--whatsapp-green);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .client-info h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .client-info p {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-bg);
+            background-image: url('https://web.whatsapp.com/img/bg-chat-tile-light_686b98c9fdffef3f63127759e2057750.png');
+            background-repeat: repeat;
+            background-blend-mode: overlay;
+        }
+        
+        .chat-header {
+            background-color: var(--sidebar-bg);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .chat-header-info {
+            margin-left: 15px;
+        }
+        
+        .chat-header-info h2 {
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .chat-header-info p {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 7.5px;
+            margin-bottom: 10px;
+            position: relative;
+            word-wrap: break-word;
+        }
+        
+        .outgoing {
+            align-self: flex-end;
+            background-color: var(--outgoing-bg);
+            border-top-right-radius: 0;
+        }
+        
+        .incoming {
+            align-self: flex-start;
+            background-color: var(--incoming-bg);
+            border-top-left-radius: 0;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #888;
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .message-input-area {
+            background-color: var(--sidebar-bg);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        
+        .send-button {
+            background-color: var(--whatsapp-green);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .send-button:hover {
+            background-color: var(--whatsapp-dark);
+        }
+        
+        /* Send Panel */
+        .send-panel {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .send-panel h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            margin: 0 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--whatsapp-green);
+        }
+        
+        .send-button-large {
+            background-color: var(--whatsapp-green);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .send-button-large:hover {
+            background-color: var(--whatsapp-dark);
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification i {
+            font-size: 24px;
+            color: var(--whatsapp-green);
+        }
+        
+        .notification-content h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .notification-content p {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .progress-bar {
+            height: 5px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: var(--whatsapp-green);
+            width: 0%;
+            transition: width 0.4s;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: 50vh;
+            }
+            
+            .chat-area {
+                height: 50vh;
+            }
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Helvetica Neue, Helvetica, sans-serif;
-    }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
 
-    body {
-      background-color: var(--wa-bg);
-      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d1d7db' fill-opacity='0.4'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
 
-    .app-container {
-      width: 100%;
-      max-width: 500px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-    /* Header Styles */
-    .header {
-      background-color: var(--wa-primary);
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      align-items: center;
-      position: relative;
-    }
+        .modal-header h2 {
+            color: var(--whatsapp-green);
+            font-size: 22px;
+        }
 
-    .header-icon {
-      margin-right: 12px;
-      display: flex;
-    }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
 
-    .header-icon svg {
-      width: 24px;
-      height: 24px;
-      fill: white;
-    }
+        .form-group {
+            margin-bottom: 15px;
+        }
 
-    .header-title {
-      font-size: 18px;
-      font-weight: 500;
-    }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
 
-    /* Chat Container Styles */
-    .chat-container {
-      background-color: white;
-    }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
 
-    .section {
-      padding: 16px;
-      border-bottom: 1px solid #f0f2f5;
-    }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
 
-    .section-title {
-      color: var(--wa-primary);
-      font-size: 16px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-    }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
 
-    .section-title svg {
-      width: 18px;
-      height: 18px;
-      fill: var(--wa-primary);
-      margin-right: 8px;
-    }
+        .btn-primary {
+            background-color: var(--whatsapp-green);
+            color: white;
+        }
 
-    /* Form Elements */
-    select, input[type="text"] {
-      width: 100%;
-      padding: 12px 15px;
-      margin: 8px 0;
-      border-radius: 8px;
-      border: 1px solid #e9edef;
-      font-size: 14px;
-      outline: none;
-      background-color: var(--wa-input-bg);
-      transition: all 0.2s;
-    }
+        .btn-primary:hover {
+            background-color: var(--whatsapp-dark);
+        }
 
-    select:focus, input[type="text"]:focus {
-      border-color: var(--wa-accent);
-      background-color: white;
-    }
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
 
-    /* Message Input Area */
-    .input-area {
-      display: flex;
-      align-items: center;
-      background-color: var(--wa-input-bg);
-      border-radius: 8px;
-      padding: 5px 5px 5px 15px;
-      margin-top: 15px;
-    }
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
 
-    .input-area input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      padding: 10px 0;
-      font-size: 15px;
-      outline: none;
-    }
+        /* Estilos para botones de acción */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+        }
 
-    .send-button {
-      background-color: var(--wa-accent);
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
+        .action-btn {
+            background-color: var(--whatsapp-green);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
 
-    .send-button:hover {
-      background-color: #20c05c;
-    }
+        .action-btn:hover {
+            background-color: var(--whatsapp-dark);
+        }
 
-    .send-button:active {
-      transform: scale(0.95);
-    }
+        .action-btn i {
+            font-size: 16px;
+        }
 
-    .send-button svg {
-      width: 20px;
-      height: 20px;
-      fill: white;
-    }
+        /* Estilo para botón de eliminar */
+        .delete-btn {
+            background-color: #ff4444;
+        }
 
-    /* Toast Notification */
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--wa-primary);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 20px;
-      font-size: 14px;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
 
-    .toast.visible {
-      opacity: 1;
-      visibility: visible;
-    }
+        /* Estilos para el selector de emojis */
+        .emoji-picker-container {
+            position: relative;
+        }
 
-    /* WhatsApp-like message bubbles */
-    .message-preview {
-      background-color: var(--wa-message-out);
-      border-radius: 8px 8px 0 8px;
-      padding: 10px 12px;
-      margin-top: 10px;
-      max-width: 80%;
-      align-self: flex-end;
-      position: relative;
-      box-shadow: 0 1px 1px rgba(0,0,0,0.05);
-    }
+        .emoji-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.2s;
+        }
 
-    .message-preview::after {
-      content: '';
-      position: absolute;
-      right: -8px;
-      top: 0;
-      width: 0;
-      height: 0;
-      border: 8px solid transparent;
-      border-left-color: var(--wa-message-out);
-      border-right: 0;
-      border-top: 0;
-      margin-top: 0;
-      margin-right: -8px;
-    }
+        .emoji-button:hover {
+            color: var(--whatsapp-green);
+            transform: scale(1.1);
+        }
 
-    .message-preview p {
-      font-size: 14px;
-      color: var(--wa-text);
-    }
+        .emoji-picker {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            width: 300px;
+            height: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+            overflow: hidden;
+        }
 
-    .message-preview .time {
-      font-size: 11px;
-      color: var(--wa-light-text);
-      text-align: right;
-      margin-top: 4px;
-    }
-  </style>
+        .emoji-picker.show {
+            display: flex;
+        }
+
+        .emoji-categories {
+            display: flex;
+            padding: 5px;
+            background: #f5f5f5;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .emoji-category {
+            flex: 1;
+            text-align: center;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .emoji-category:hover {
+            background: #e0e0e0;
+        }
+
+        .emoji-category.active {
+            background: var(--whatsapp-green);
+            color: white;
+        }
+
+        .emoji-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+        }
+
+        .emoji-item {
+            font-size: 22px;
+            text-align: center;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .emoji-item:hover {
+            background: #f0f0f0;
+            transform: scale(1.2);
+        }
+    </style>
 </head>
 <body>
-  <div class="app-container">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-      </div>
-      <h1 class="header-title">WhatsApp Message Sender</h1>
-    </div>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="header">
+                <div class="logo">
+                    <i class="fab fa-whatsapp"></i>
+                    <h1>Envío Masivo</h1>
+                </div>
+            </div>
+            
+            <div class="list-selection">
+                <h2>Seleccione lista de clientes</h2>
+                <select id="listSelector" class="list-selector">
+                    <option value="">-- Seleccione una lista --</option>
+                    <option value="clientesMayoristas">Clientes Mayoristas</option>
+                    <option value="clientesMinoristas">Clientes Minoristas</option>
+                </select>
+            </div>
+            
+            <div class="client-list" id="clientList">
+                <!-- Client list will be populated here -->
+            </div>
 
-    <!-- Main Content -->
-    <div class="chat-container">
-      <!-- Mass Message Section -->
-      <div class="section">
-        <h2 class="section-title">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-          </svg>
-          Mensaje Masivo
-        </h2>
-        <label for="tipoCliente">Selecciona tipo de cliente:</label>
-        <select id="tipoCliente">
-          <option value="">-- Selecciona --</option>
-          <option value="mayoristas">Clientes Mayoristas</option>
-          <option value="minoristas">Clientes Minoristas</option>
-        </select>
-
-        <div class="input-area">
-          <input type="text" id="mensaje" placeholder="Escribe un mensaje..." required>
-          <button id="sendMass" class="send-button" title="Enviar">
-            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-          </button>
+            <div class="action-buttons">
+                <button class="action-btn" id="addClientBtn">
+                    <i class="fas fa-plus"></i> Añadir Cliente
+                </button>
+                <button class="action-btn" id="editClientBtn" disabled>
+                    <i class="fas fa-edit"></i> Editar
+                </button>
+                <button class="action-btn delete-btn" id="deleteClientBtn" disabled>
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </div>
         </div>
-      </div>
-
-      <!-- Individual Message Section -->
-      <div class="section">
-        <h2 class="section-title">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-          </svg>
-          Mensaje Individual
-        </h2>
-        <label for="numeroIndividual">Selecciona un cliente:</label>
-        <select id="numeroIndividual">
-          <option value="">-- Selecciona un cliente --</option>
-        </select>
-
-        <div class="input-area">
-          <input type="text" id="mensajeIndividual" placeholder="Escribe mensaje individual..." required>
-          <button id="sendIndividual" class="send-button" title="Enviar individual">
-            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Message Preview -->
-      <div class="section" id="previewSection" style="display: none;">
-        <h2 class="section-title">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/>
-          </svg>
-          Vista Previa
-        </h2>
-        <div class="message-preview">
-          <p id="previewText">Este es un ejemplo de cómo se verá tu mensaje</p>
-          <div class="time" id="previewTime">12:34 PM</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Notification -->
-  <div class="toast" id="toast">Mensaje enviado correctamente</div>
-
-  <script>
-    // Client data
-    const clientes = {
-      mayoristas: [
-        { nombre: "Josue Sandoval", codigoPais: "51", numeroWhatsApp: "942360587" },
-        { nombre: "Erwin Riofrio", codigoPais: "51", numeroWhatsApp: "947339263" }
-      ],
-      minoristas: [
-        { nombre: "Leonardo Giron", codigoPais: "51", numeroWhatsApp: "920392176" },
-        { nombre: "Ronaldinho Pintado", codigoPais: "51", numeroWhatsApp: "916173721" }
-      ]
-    };
-
-    // DOM Elements
-    const tipoClienteSelect = document.getElementById("tipoCliente");
-    const mensajeInput = document.getElementById("mensaje");
-    const sendMassBtn = document.getElementById("sendMass");
-
-    const numeroIndividualSelect = document.getElementById("numeroIndividual");
-    const mensajeIndividualInput = document.getElementById("mensajeIndividual");
-    const sendIndividualBtn = document.getElementById("sendIndividual");
-
-    const previewSection = document.getElementById("previewSection");
-    const previewText = document.getElementById("previewText");
-    const previewTime = document.getElementById("previewTime");
-
-    const toast = document.getElementById("toast");
-
-    // Initialize the app
-    document.addEventListener('DOMContentLoaded', function() {
-      loadClientNumbers();
-      setupEventListeners();
-    });
-
-    // Load client numbers into individual select
-    function loadClientNumbers() {
-      numeroIndividualSelect.innerHTML = '<option value="">-- Selecciona un cliente --</option>';
-      
-      ["mayoristas", "minoristas"].forEach(tipo => {
-        clientes[tipo].forEach(cliente => {
-          const option = document.createElement("option");
-          option.value = `${cliente.codigoPais}${cliente.numeroWhatsApp}@s.whatsapp.net`;
-          option.textContent = `${cliente.nombre} (${cliente.codigoPais}${cliente.numeroWhatsApp})`;
-          numeroIndividualSelect.appendChild(option);
-        });
-      });
-    }
-
-    // Setup event listeners
-    function setupEventListeners() {
-      // Mass message send
-      sendMassBtn.addEventListener('click', sendMassMessages);
-      mensajeInput.addEventListener('input', updateMessagePreview);
-
-      // Individual message send
-      sendIndividualBtn.addEventListener('click', sendIndividualMessage);
-      mensajeIndividualInput.addEventListener('input', updateMessagePreview);
-
-      // Also allow form submission with Enter key
-      mensajeInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          sendMassMessages();
-        }
-      });
-
-      mensajeIndividualInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          sendIndividualMessage();
-        }
-      });
-    }
-
-    // Send mass messages
-    async function sendMassMessages() {
-      const tipo = tipoClienteSelect.value;
-      const mensaje = mensajeInput.value.trim();
-
-      if (!tipo) {
-        showToast("⚠️ Selecciona un tipo de cliente");
-        return;
-      }
-
-      if (!mensaje) {
-        showToast("⚠️ El mensaje no puede estar vacío");
-        return;
-      }
-
-      const lista = clientes[tipo];
-      let successCount = 0;
-
-      for (const cliente of lista) {
-        const numero = `${cliente.codigoPais}${cliente.numeroWhatsApp}@s.whatsapp.net`;
-        const success = await sendMessage(numero, mensaje, cliente.nombre);
-        if (success) successCount++;
-      }
-
-      showToast(`✅ Enviado a ${successCount} de ${lista.length} clientes`);
-      mensajeInput.value = "";
-      previewSection.style.display = "none";
-    }
-
-    // Send individual message
-    async function sendIndividualMessage() {
-      const numero = numeroIndividualSelect.value;
-      const mensaje = mensajeIndividualInput.value.trim();
-
-      if (!numero) {
-        showToast("⚠️ Selecciona un cliente");
-        return;
-      }
-
-      if (!mensaje) {
-        showToast("⚠️ El mensaje no puede estar vacío");
-        return;
-      }
-
-      const clienteNombre = numeroIndividualSelect.options[numeroIndividualSelect.selectedIndex].text.split(' (')[0];
-      const success = await sendMessage(numero, mensaje, clienteNombre);
-
-      if (success) {
-        showToast("✅ Mensaje enviado");
-        mensajeIndividualInput.value = "";
-        previewSection.style.display = "none";
-      }
-    }
-
-    // Send message via API
-    async function sendMessage(numero, mensaje, nombre) {
-      try {
-        // In a real app, you would make an actual API call here
-        // This is a simulation that always succeeds after a short delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        console.log(`Message to ${nombre} (${numero}): ${mensaje}`);
-        return true;
-      } catch (error) {
-        console.error(`Error sending to ${nombre}:`, error);
-        return false;
-      }
-    }
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="client-avatar">W</div>
+                <div class="chat-header-info">
+                    <h2 id="chatTitle">WhatsApp</h2>
+                    <p id="chatSubtitle">Seleccione un cliente para ver detalles</p>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message incoming">
+                    ¡Hola! Bienvenido al sistema de envío masivo de WhatsApp.
+                    <div class="message-time">10:00</div>
+                </div>
+                <div class="message incoming">
+                    Seleccione una lista de clientes en el panel izquierdo y escriba su mensaje.
+                    <div class="message-time">10:00</div>
+                </div>
+            </div>
+            
+            <div class="message-input-area">
+                <i class="fas fa-paperclip" style="font-size: 24px; color: #666;"></i>
+                <div class="emoji-picker-container">
+                    <button class="emoji-button" id="emojiButton">
+                        <i class="far fa-smile"></i>
+                    </button>
+                    <div class="emoji-picker" id="emojiPicker"></div>
+                </div>
+                <input type="text" class="message-input" id="chat_input_message" placeholder="Escriba su mensaje...">
+                <button class="send-button" id="chat_button_send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Send Panel -->
+    <div class="send-panel">
+        <h2>Enviar mensaje a lista completa</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total Clientes</h3>
+                <div class="number" id="totalClients">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Mensaje</h3>
+                <div class="number" id="messageLength">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Caracteres</h3>
+                <div class="number" id="charCount">0</div>
+            </div>
+        </div>
+        <button class="send-button-large" id="sendBulkButton">
+            <i class="fas fa-paper-plane"></i>
+            ENVIAR A TODA LA LISTA
+        </button>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div class="notification-content">
+            <h3>¡Mensajes enviados!</h3>
+            <p id="notificationText">El mensaje ha sido enviado a todos los clientes.</p>
+            <div class="progress-bar">
+                <div class="progress" id="notificationProgress"></div>
+            </div>
+        </div>
+    </div>
 
-    // Update message preview
-    function updateMessagePreview() {
-      const message = this.value.trim();
-      
-      if (message) {
-        previewText.textContent = message;
-        previewTime.textContent = getCurrentTime();
-        previewSection.style.display = "block";
-      } else {
-        previewSection.style.display = "none";
-      }
-    }
+    <div class="modal" id="clientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Añadir Nuevo Cliente</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <form id="clientForm">
+                <input type="hidden" id="editIndex">
+                <input type="hidden" id="editListType">
+                
+                <div class="form-group">
+                    <label for="clientName">Nombre del Cliente</label>
+                    <input type="text" id="clientName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="countryCode">Código de País</label>
+                    <select id="countryCode" required>
+                        <option value="51">Perú (+51)</option>
+                        <option value="52">México (+52)</option>
+                        <option value="54">Argentina (+54)</option>
+                        <option value="55">Brasil (+55)</option>
+                        <option value="56">Chile (+56)</option>
+                        <option value="57">Colombia (+57)</option>
+                        <option value="58">Venezuela (+58)</option>
+                        <option value="1">USA/Canadá (+1)</option>
+                        <option value="34">España (+34)</option>
+                        <option value="other">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phoneNumber">Número de WhatsApp</label>
+                    <input type="tel" id="phoneNumber" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="clientType">Tipo de Cliente</label>
+                    <select id="clientType" required>
+                        <option value="clientesMayoristas">Mayorista</option>
+                        <option value="clientesMinoristas">Minorista</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    // Get current time in HH:MM AM/PM format
-    function getCurrentTime() {
-      const now = new Date();
-      let hours = now.getHours();
-      const minutes = now.getMinutes();
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      
-      hours = hours % 12;
-      hours = hours ? hours : 12; // the hour '0' should be '12'
-      const minutesStr = minutes < 10 ? '0'+minutes : minutes;
-      
-      return `${hours}:${minutesStr} ${ampm}`;
-    }
+    <script>
+        // Datos de clientes
+        let listaDeClientes = JSON.parse(localStorage.getItem('whatsappContacts')) || {
+            clientesMayoristas: [
+                {
+                    id: "1",
+                    whatsapp: "947339263",
+                    codigoPais: "51",
+                    nombre: "Sucursales Riofrio"
+                },
+                {
+                    id: "2",
+                    whatsapp: "942360587",
+                    codigoPais: "51",
+                    nombre: "Industrias Sandoval"
+                }
+            ],
+            clientesMinoristas: [
+                {
+                    id: "3",
+                    whatsapp: "916173721",
+                    codigoPais: "51",
+                    nombre: "Ronaldinho"
+                },
+                {
+                    id: "4",
+                    whatsapp: "920392176",
+                    codigoPais: "51",
+                    nombre: "Leo"
+                }
+            ]
+        };
 
-    // Show toast notification
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add('visible');
-      
-      setTimeout(() => {
-        toast.classList.remove('visible');
-      }, 3000);
-    }
-  </script>
+        // Guardar en localStorage
+        function saveContacts() {
+            localStorage.setItem('whatsappContacts', JSON.stringify(listaDeClientes));
+        };
+        
+        // Referencias a elementos del DOM
+        const listSelector = document.getElementById('listSelector');
+        const clientList = document.getElementById('clientList');
+        const chatTitle = document.getElementById('chatTitle');
+        const chatSubtitle = document.getElementById('chatSubtitle');
+        const chat_input_message = document.getElementById('chat_input_message');
+        const chat_button_send = document.getElementById('chat_button_send');
+        const sendBulkButton = document.getElementById('sendBulkButton');
+        const chatMessages = document.getElementById('chatMessages');
+        const totalClients = document.getElementById('totalClients');
+        const charCount = document.getElementById('charCount');
+        const messageLength = document.getElementById('messageLength');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const notificationProgress = document.getElementById('notificationProgress');
+        const modal = document.getElementById('clientModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const clientForm = document.getElementById('clientForm');
+        const clientName = document.getElementById('clientName');
+        const countryCode = document.getElementById('countryCode');
+        const phoneNumber = document.getElementById('phoneNumber');
+        const clientType = document.getElementById('clientType');
+        const editIndex = document.getElementById('editIndex');
+        const editListType = document.getElementById('editListType');
+        const addClientBtn = document.getElementById('addClientBtn');
+        const editClientBtn = document.getElementById('editClientBtn');
+        const deleteClientBtn = document.getElementById('deleteClientBtn');
+        const closeModal = document.getElementById('closeModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        // Variables de estado
+        let selectedList = null;
+        let selectedClient = null;
+        const TOKEN = 'Cr6ZdDPfZ1Bw1IlIahm9y9618ECknHeRuKnEo5dJn7Y';
+        
+        // Inicializar la aplicación
+        function initApp() {
+            loadClientList();
+            updateStats();
+            updateActionButtons();
+            initEmojiPicker();
+            
+            // Simular notificación de bienvenida
+            setTimeout(() => {
+                showNotification('Sistema de envío masivo listo. Seleccione una lista para comenzar.', false);
+            }, 2000);
+        }
+
+        // Abrir modal para añadir nuevo cliente
+        addClientBtn.addEventListener('click', () => {
+            modalTitle.textContent = 'Añadir Nuevo Cliente';
+            clientForm.reset();
+            editIndex.value = '';
+            editListType.value = '';
+            modal.style.display = 'flex';
+        });
+
+        // Abrir modal para editar cliente
+        editClientBtn.addEventListener('click', () => {
+            if (!selectedClient) return;
+            
+            modalTitle.textContent = 'Editar Cliente';
+            clientName.value = selectedClient.nombre;
+            countryCode.value = selectedClient.codigoPais;
+            phoneNumber.value = selectedClient.whatsapp;
+            
+            // Determinar a qué lista pertenece el cliente
+            const listType = listaDeClientes.clientesMayoristas.some(c => c.id === selectedClient.id) ? 
+                           'clientesMayoristas' : 'clientesMinoristas';
+            clientType.value = listType;
+            
+            // Guardar referencia para la edición
+            editListType.value = listType;
+            editIndex.value = listaDeClientes[listType].findIndex(c => c.id === selectedClient.id);
+            
+            modal.style.display = 'flex';
+        });
+
+        // Eliminar cliente
+        deleteClientBtn.addEventListener('click', () => {
+            if (!selectedClient) return;
+            
+            if (confirm(`¿Estás seguro de eliminar a ${selectedClient.nombre}?`)) {
+                // Buscar y eliminar el cliente de la lista correspondiente
+                for (const listType in listaDeClientes) {
+                    const index = listaDeClientes[listType].findIndex(c => c.id === selectedClient.id);
+                    
+                    if (index !== -1) {
+                        listaDeClientes[listType].splice(index, 1);
+                        break;
+                    }
+                }
+                
+                saveContacts();
+                loadClientList();
+                selectedClient = null;
+                updateActionButtons();
+                
+                // Reset chat view
+                chatTitle.textContent = 'WhatsApp';
+                chatSubtitle.textContent = 'Seleccione un cliente para ver detalles';
+                chatMessages.innerHTML = '';
+                addMessage('incoming', 'Seleccione un cliente de la lista para comenzar a chatear');
+                
+                showNotification('Cliente eliminado correctamente', false);
+            }
+        });
+
+        // Cerrar modal
+        closeModal.addEventListener('click', closeModalFunc);
+        cancelBtn.addEventListener('click', closeModalFunc);
+        
+        function closeModalFunc() {
+            modal.style.display = 'none';
+        }
+
+        // Guardar cliente (añadir o editar)
+        clientForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Validar número de teléfono
+            if (!/^\d{9,15}$/.test(phoneNumber.value.trim())) {
+                showNotification('Por favor ingrese un número de teléfono válido', false);
+                return;
+            }
+            
+            const cliente = {
+                id: editIndex.value === '' ? Date.now().toString() : selectedClient.id,
+                nombre: clientName.value.trim(),
+                codigoPais: countryCode.value,
+                whatsapp: phoneNumber.value.trim()
+            };
+            
+            if (editIndex.value === '') {
+                // Añadir nuevo cliente
+                const listType = clientType.value;
+                listaDeClientes[listType].push(cliente);
+                
+                showNotification('Cliente añadido correctamente', false);
+            } else {
+                // Editar cliente existente
+                const oldListType = editListType.value;
+                const newListType = clientType.value;
+                const index = parseInt(editIndex.value);
+                
+                // Si cambió de lista, lo movemos
+                if (oldListType !== newListType) {
+                    // Eliminar de la lista anterior
+                    listaDeClientes[oldListType].splice(index, 1);
+                    // Añadir a la nueva lista
+                    listaDeClientes[newListType].push(cliente);
+                } else {
+                    // Actualizar en la misma lista
+                    listaDeClientes[oldListType][index] = cliente;
+                }
+                
+                showNotification('Cliente actualizado correctamente', false);
+            }
+            
+            saveContacts();
+            loadClientList();
+            closeModalFunc();
+            
+            // Actualizar selección si estamos editando
+            if (editIndex.value !== '') {
+                selectClient(cliente);
+            }
+        });
+
+        // Emoji data (simplified version)
+        const emojiCategories = [
+            {
+                name: "smileys",
+                emojis: ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳"]
+            },
+            {
+                name: "people",
+                emojis: ["👋", "🤚", "🖐", "✋", "🖖", "👌", "🤏", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆", "👇", "🖕", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏"]
+            },
+            {
+                name: "nature",
+                emojis: ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐸", "🐵", "🐔", "🐧", "🐦", "🐤", "🐣", "🐥", "🦆", "🦅", "🦉", "🦇", "🐺", "🐗", "🐴", "🦄","🗿"]
+            },
+            {
+                name: "food",
+                emojis: ["🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🍈", "🍒", "🍑", "🍍", "🥭", "🥥", "🥝", "🍅", "🍆", "🥑", "🥦", "🥬", "🥒", "🌶", "🌽", "🥕", "🧄", "🧅", "🥔", "🍠"]
+            },
+            {
+                name: "activities",
+                emojis: ["⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱", "🪀", "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "🪃", "🥅", "⛳", "🪁", "🏹", "🎣", "🤿", "🥊", "🥋", "🎽", "🛹", "🛷"]
+            }
+        ];
+
+        // Emoji picker functionality
+        const emojiButton = document.getElementById('emojiButton');
+        const emojiPicker = document.getElementById('emojiPicker');
+        let currentCategory = 0;
+
+       function initEmojiPicker() {
+            // Create categories tabs
+            const categoriesDiv = document.createElement('div');
+            categoriesDiv.className = 'emoji-categories';
+            
+            emojiCategories.forEach((category, index) => {
+                const tab = document.createElement('div');
+                tab.className = `emoji-category ${index === 0 ? 'active' : ''}`;
+                tab.textContent = category.name;
+                tab.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Detener la propagación aquí también
+                    document.querySelectorAll('.emoji-category').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentCategory = index;
+                    renderEmojis();
+                });
+                categoriesDiv.appendChild(tab);
+            });
+            
+            emojiPicker.appendChild(categoriesDiv);
+            
+            // Create emoji list container
+            const emojiList = document.createElement('div');
+            emojiList.className = 'emoji-list';
+            emojiList.id = 'emojiList';
+            emojiPicker.appendChild(emojiList);
+            
+            // Initial render
+            renderEmojis();
+        }
+        
+
+
+        function renderEmojis() {
+            const emojiList = document.getElementById('emojiList');
+            emojiList.innerHTML = '';
+            
+            emojiCategories[currentCategory].emojis.forEach(emoji => {
+                const emojiItem = document.createElement('div');
+                emojiItem.className = 'emoji-item';
+                emojiItem.textContent = emoji;
+                emojiItem.addEventListener('click', () => {
+                    chat_input_message.value += emoji;
+                    chat_input_message.focus();
+                    updateStats();
+                });
+                emojiList.appendChild(emojiItem);
+            });
+        }
+
+
+        // Actualizar botones de edición/eliminación cuando se selecciona un cliente
+        function updateActionButtons() {
+            editClientBtn.disabled = !selectedClient;
+            deleteClientBtn.disabled = !selectedClient;
+        }
+
+        // Cargar listas de clientes al seleccionar
+        listSelector.addEventListener('change', function() {
+            selectedList = this.value;
+            selectedClient = null;
+            loadClientList();
+            updateStats();
+            updateActionButtons();
+            
+            // Reset chat view when changing lists
+            chatTitle.textContent = 'WhatsApp';
+            chatSubtitle.textContent = 'Seleccione un cliente para ver detalles';
+            chatMessages.innerHTML = '';
+            addMessage('incoming', selectedList ? 
+                `Lista "${listSelector.options[listSelector.selectedIndex].text}" seleccionada. Seleccione un cliente.` : 
+                'Seleccione una lista de clientes para comenzar');
+        });
+        
+        // Cargar lista de clientes
+        function loadClientList() {
+            clientList.innerHTML = '';
+            
+            if (!selectedList) {
+                return;
+            }
+            
+            const clients = listaDeClientes[selectedList];
+            
+            if (clients.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'client-item';
+                emptyMessage.innerHTML = '<div style="width:100%; text-align:center; color:#777;">No hay clientes en esta lista</div>';
+                clientList.appendChild(emptyMessage);
+                return;
+            }
+            
+            clients.forEach(client => {
+                const clientItem = document.createElement('div');
+                clientItem.className = 'client-item';
+                if (selectedClient && selectedClient.id === client.id) {
+                    clientItem.classList.add('selected');
+                }
+                
+                clientItem.innerHTML = `
+                    <div class="client-avatar">${client.nombre.charAt(0)}</div>
+                    <div class="client-info">
+                        <h3>${client.nombre}</h3>
+                        <p>${client.codigoPais} ${client.whatsapp}</p>
+                    </div>
+                `;
+                
+                clientItem.addEventListener('click', () => {
+                    document.querySelectorAll('.client-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    clientItem.classList.add('selected');
+                    selectClient(client);
+                });
+                
+                clientList.appendChild(clientItem);
+            });
+        }
+        
+        // Seleccionar cliente
+        function selectClient(client) {
+            selectedClient = client;
+            chatTitle.textContent = client.nombre;
+            chatSubtitle.textContent = client.codigoPais + ' ' + client.whatsapp;
+            
+            // Simular historial de chat
+            chatMessages.innerHTML = '';
+            addMessage('incoming', `¡Hola! Soy ${client.nombre}, ¿en qué puedo ayudarte?`);
+            
+            // Enfocar el campo de mensaje
+            chat_input_message.focus();
+            updateActionButtons();
+        }
+        
+        // Actualizar estadísticas
+        function updateStats() {
+            if (!selectedList) {
+                totalClients.textContent = '0';
+                messageLength.textContent = '0';
+                charCount.textContent = '0';
+                return;
+            }
+            
+            const clients = listaDeClientes[selectedList];
+            totalClients.textContent = clients.length;
+            
+            const msg = chat_input_message.value;
+            messageLength.textContent = msg ? '1' : '0';
+            charCount.textContent = msg.length;
+        }
+        
+        // Añadir mensaje al chat
+        function addMessage(type, text) {
+            const now = new Date();
+            const time = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `
+                ${text}
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Enviar mensaje a un cliente individual
+        function sendSingleMessage() {
+            const message = chat_input_message.value.trim();
+            if (!message || !selectedClient) return;
+            
+            // Formatear número para WhatsApp
+            const phoneNumber = `${selectedClient.codigoPais}${selectedClient.whatsapp}`;
+            
+            // Cerrar el emoji picker si está abierto
+            emojiPicker.classList.remove('show');
+            
+            // Enviar mensaje usando API
+            sendWhatsAppMessage(phoneNumber, message)
+                .then(() => {
+                    addMessage('outgoing', message);
+                    showNotification(`Mensaje enviado a ${selectedClient.nombre}`, false);
+                })
+                .catch(error => {
+                    console.error('Error al enviar mensaje:', error);
+                    showNotification('Error al enviar el mensaje', false);
+                });
+            
+            chat_input_message.value = '';
+            updateStats();
+        }
+        
+        // Enviar mensaje a toda la lista
+        function sendBulkMessage() {
+            const message = chat_input_message.value.trim();
+            if (!message || !selectedList) {
+                showNotification('Por favor, seleccione una lista y escriba un mensaje', false);
+                return;
+            }
+            
+            const clients = listaDeClientes[selectedList];
+            if (clients.length === 0) {
+                showNotification('No hay clientes en la lista seleccionada', false);
+                return;
+            }
+            
+            showNotification(`Enviando mensaje a ${clients.length} clientes...`, true);
+            
+            // Simular progreso de envío
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                notificationProgress.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    // Enviar mensajes reales a todos los clientes
+                    sendMessagesToAll(clients, message);
+                }
+            }, 100);
+        }
+        
+        // Enviar mensajes a todos los clientes de la lista
+        function sendMessagesToAll(clients, message) {
+            clients.forEach((client, index) => {
+                setTimeout(() => {
+                    const phoneNumber = `${client.codigoPais}${client.whatsapp}`;
+                    
+                    sendWhatsAppMessage(phoneNumber, message)
+                        .then(() => {
+                            notificationText.innerHTML = `Enviado a ${index + 1} de ${clients.length}: ${client.nombre}`;
+                            
+                            if (index === clients.length - 1) {
+                                notificationText.innerHTML = `¡Mensaje enviado a ${clients.length} clientes!`;
+                                addMessage('outgoing', `(Mensaje enviado a ${clients.length} clientes): ${message}`);
+                            }
+                        })
+                        .catch(error => {
+                            console.error(`Error enviando a ${client.nombre}:`, error);
+                        });
+                }, index * 1000); // Enviar cada segundo para evitar saturación
+            });
+        }
+        
+        // Función para enviar mensaje usando API de WhatsApp
+        function sendWhatsAppMessage(phone, message) {
+            return fetch(`https://apiwachat-1.apierp.dev/wa/3030/send`, {
+                method: 'POST',
+                headers: { 
+                    'x-auth-token': TOKEN, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({
+                    to: `${phone}@s.whatsapp.net`,
+                    payload: {
+                        type: 'text',
+                        content: message
+                    }
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta de la API');
+                }
+                return response.json();
+            });
+        }
+        
+        // Mostrar notificación
+        function showNotification(text, isProgress) {
+            notificationText.textContent = text;
+            notificationProgress.style.width = '0%';
+            
+            if (isProgress) {
+                notification.classList.add('show');
+            } else {
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+        
+        // Event Listeners
+        chat_input_message.addEventListener('input', updateStats);
+        chat_input_message.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                // Cerrar el emoji picker si está abierto
+                emojiPicker.classList.remove('show');
+                sendSingleMessage();
+            }
+        });
+        
+        // Toggle emoji picker
+        emojiButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            emojiPicker.classList.toggle('show');
+        });
+
+        // Close emoji picker when clicking outside
+        document.addEventListener('click', () => {
+            emojiPicker.classList.remove('show');
+        });
+
+        // Prevent closing when clicking inside picker
+        emojiPicker.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+        // Asegúrate de que el evento de enviar mensaje tenga stopPropagation
+        chat_button_send.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            sendSingleMessage();
+        });
+        sendBulkButton.addEventListener('click', sendBulkMessage);
+        
+        // Inicializar la aplicación
+        initApp();
+    </script>
 </body>
 </html>
