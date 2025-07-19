@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Vehículos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Reporte de Vehículos</h1>
+    <div id="loading" class="loading">Cargando datos de vehículos...</div>
+    <div id="vehiculos-container" style="display: none;">
+        <table id="tabla-vehiculos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Marca</th>
+                    <th>Placa</th>
+                    <th>Color</th>
+                    <th>Año</th>
+                    <th>Kilometraje</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-body">
+                <!-- Los datos se cargarán aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hacer la petición a la API
+            fetch('obtener_vehiculos.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta de la red');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Ocultar mensaje de carga
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    // Mostrar contenedor
+                    document.getElementById('vehiculos-container').style.display = 'block';
+                    
+                    // Obtener referencia al cuerpo de la tabla
+                    const tbody = document.getElementById('tabla-body');
+                    
+                    // Procesar cada vehículo
+                    data.vehiculos.forEach(vehiculo => {
+                        const row = document.createElement('tr');
+                        
+                        row.innerHTML = `
+                            <td>${vehiculo.vehiculoId}</td>
+                            <td>${vehiculo.vehiculoNombre}</td>
+                            <td>${vehiculo.vehiculoMarca}</td>
+                            <td>${vehiculo.vehiculoPlaca}</td>
+                            <td>${vehiculo.vehiculoColor}</td>
+                            <td>${vehiculo.vehiculoAnio}</td>
+                            <td>${vehiculo.vehiculoKilometraje.toLocaleString()} km</td>
+                        `;
+                        
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al obtener los vehículos:', error);
+                    document.getElementById('loading').textContent = 
+                        'Error al cargar los datos de vehículos. Por favor, intente nuevamente.';
+                });
+        });
+    </script>
+</body>
+</html>
