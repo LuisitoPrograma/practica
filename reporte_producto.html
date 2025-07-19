@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Productos</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .error-message {
+            color: red;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Listado de Productos</h1>
+    <div id="tabla-container"></div>
+
+    <script>
+        let lista_productos = [];
+        
+        function generarTablaProductos() {
+            fetch('obtener_productos.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la solicitud: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Datos recibidos:', data);
+                    if (data && data.setproductos) {
+                        lista_productos = data.setproductos;
+                        mostrarProductosEnTabla();
+                    } else {
+                        throw new Error('Formato de datos incorrecto');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener los productos:', error);
+                    document.getElementById('tabla-container').innerHTML = 
+                        '<p class="error-message">Error al cargar los productos: ' + error.message + '</p>';
+                });
+        }
+
+        function formatearPrecio(precio) {
+            // Asegurarnos de que el precio sea un número
+            const precioNum = parseFloat(precio);
+            return isNaN(precioNum) ? '0.00' : precioNum.toFixed(2);
+        }
+
+        function mostrarProductosEnTabla() {
+            const container = document.getElementById('tabla-container');
+            
+            if (!Array.isArray(lista_productos)) {
+                container.innerHTML = '<p class="error-message">Formato de datos inválido</p>';
+                return;
+            }
+
+            if (lista_productos.length === 0) {
+                container.innerHTML = '<p>No hay productos registrados</p>';
+                return;
+            }
+
+            try {
+                let html = '<table>';
+                html += `
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Marca</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+
+                lista_productos.forEach(producto => {
+                    html += `
+                        <tr>
+                            <td>${producto.id_producto || '-'}</td>
+                            <td>${producto.nombre || '-'}</td>
+                            <td>${producto.marca || '-'}</td>
+                            <td>${producto.categoria || '-'}</td>
+                            <td>${formatearPrecio(producto.precio)}</td>
+                            <td>${producto.stock || '0'}</td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error al generar la tabla:', error);
+                container.innerHTML = '<p class="error-message">Error al mostrar los productos: ' + error.message + '</p>';
+            }
+        }
+
+        // Cargar los productos cuando la página se cargue
+        document.addEventListener('DOMContentLoaded', generarTablaProductos);
+    </script>
+</body>
+</html>
