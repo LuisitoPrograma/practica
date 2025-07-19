@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let lista_clientes;
+       function generarTablaClientes(){
+         fetch('obtener_clientes.php')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la solicitud: ' + response.status);
+        }
+        return response.json(); // Parsear la respuesta como JSON
+      })
+      .then(clientes => {
+        console.log(clientes);
+        lista_clientes = clientes;
+      })
+      .catch(error => {
+        console.error('Error al obtener los clientes:', error);
+      });
+       }
+    </script>
+</body>
+</html>
